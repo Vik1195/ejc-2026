@@ -101,7 +101,10 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px}
 </div></div>
 <footer>Based on the official schedule at ejc2026.org/program (as of 1 Aug 2026) and the EJC 2026 programme booklet. Locations open in Google Maps. All times local (Ptuj, CEST).</footer>
 <script>
+function ymdToday(){var d=new Date();function p(n){return(n<10?'0':'')+n}return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());}
+var TODAY=ymdToday();
 var currentSection='events', currentDay='20260801', inPlan=false;
+if(TODAY>='20260801'&&TODAY<='20260809'){currentDay=TODAY;}
 function render(){
   document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('show')});
   var tabs=document.querySelector('.tabs'), legend=document.querySelector('.legend'), hint=document.querySelector('.hint');
@@ -125,7 +128,9 @@ function render(){
     document.querySelectorAll('.tab').forEach(function(t){
       var d=t.id.replace('tab-','');
       t.classList.toggle('active', d===currentDay);
-      t.classList.toggle('hidden', currentSection==='ws' && (d<'20260802'||d>'20260808'));
+      var wsHide = currentSection==='ws' && (d<'20260802'||d>'20260808');
+      var pastHide = (TODAY>='20260801'&&TODAY<='20260809') && d<TODAY;
+      t.classList.toggle('hidden', wsHide||pastHide);
     });
     document.getElementById('seg-events').classList.toggle('active',currentSection==='events');
     document.getElementById('seg-ws').classList.toggle('active',currentSection==='ws');
