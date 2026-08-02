@@ -59,6 +59,7 @@ h2{color:var(--red);font-size:17px;margin:16px 4px 12px}
 #wstitle,#wsloc{flex:1;min-width:200px}
 .wsmsg{font-size:12px;color:var(--red)}
 .wscreator{font-size:11.5px;color:#9a8d80;margin-top:4px}
+.wsdel{display:block;margin-top:8px;border:1px solid #d9a0a0;background:#fdf3f2;color:#a33;border-radius:9px;padding:8px 12px;font-size:12.5px;font-weight:700;cursor:pointer}
 .seg{display:flex;gap:8px;padding:12px 12px 2px;justify-content:center;background:var(--bg)}
 .segbtn{flex:1;max-width:220px;padding:11px 10px;border:1px solid #e2d6c4;border-radius:13px;background:#fff;color:#8a7d70;font-weight:800;font-size:14.5px;cursor:pointer}
 .segbtn.active{background:var(--petrol);border-color:var(--petrol);color:#fff}
@@ -101,6 +102,7 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px}
 <li><b>&#9728; Volleyclub heat schedule:</b> Mon 16&ndash;18 Find Your Partner &middot; Tue 16&ndash;18 Workshops &middot; Wed 10&ndash;12:30 Group Stage &amp; 16&ndash;20 Winners Quals &middot; Thu 18:00 Finals Show.</li>
 <li><b>Workshops</b> can now include a short description when you post them.</li>
 <li><b>&#128205; New Map button</b> up top: the official festival map of Ptuj with all venues.</li>
+<li><b>&#128465; Delete your own workshops:</b> open a workshop you posted &ndash; there's now a delete button inside.</li>
 </ul>
 <button class="wnbtn" onclick="dismissWn()">Got it!</button>
 </div></div>
@@ -454,6 +456,14 @@ function submitWorkshop(){
     }
   });
 }
+function deleteWorkshop(id){
+  if(!db||!uid)return;
+  if(!confirm('Delete this workshop for everyone?'))return;
+  db.collection('workshops').doc(id).delete().then(function(){
+    var eid='ws_'+id;
+    if(favs[eid]){delete favs[eid]; saveFavs(); syncFav(eid,false); refreshFavUI();}
+  }).catch(function(e){alert('Could not delete: '+(e&&e.message||e));});
+}
 function renderWorkshops(){
   var body=document.getElementById('wsbody'); body.innerHTML='';
   var all=WALL.concat(wsList);
@@ -489,6 +499,12 @@ function renderWorkshops(){
         "<div class='details'>"+locHtml+
         (w.desc?("<div class='cd'>"+escHtml(w.desc)+"</div>"):"")+
         "<div class='wscreator'>posted by "+escHtml(w.name||'Anonymous')+"</div></div>";
+      if(uid && w.id.indexOf(uid+'_')===0){
+        var del=document.createElement('button');
+        del.className='wsdel'; del.innerHTML='&#128465; Delete my workshop';
+        del.onclick=(function(wid){return function(e){e.stopPropagation();deleteWorkshop(wid);};})(w.id);
+        card.querySelector('.details').appendChild(del);
+      }
       body.appendChild(card);
     });
   });
@@ -526,7 +542,7 @@ function initFirebase(){
 initFirebase();
 
 // ---- What's new (shown once per version) ----
-var APP_VERSION='6';
+var APP_VERSION='7';
 function dismissWn(){
   document.getElementById('whatsnew').style.display='none';
   try{localStorage.setItem('ejcVer',APP_VERSION);}catch(e){}
