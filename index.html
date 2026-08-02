@@ -332,8 +332,38 @@ var WSDAY={20260802:'Sunday, 2 August',20260803:'Monday, 3 August',20260804:'Tue
 var wsList=[];
 // Workshops transcribed from the physical workshop wall (updated via deploy)
 var WALL=[
+ {id:'wall_quirky_steve_0803',title:'3-Ball Quirky Tricks with Steve',day:'20260803',start:'09:00',end:'10:00',
+  loc:'Juggling Hall - Black Mat',desc:'Some beginners & intermediate.',name:'Workshop wall'},
+ {id:'wall_sacredgeo_0803',title:'Sacred Geometry - Step 2',day:'20260803',start:'10:00',end:'11:00',
+  loc:'Main Hall - Red Mat',desc:'Step 2. Contact on the wall card: +33 619 637 152.',name:'Workshop wall'},
+ {id:'wall_hatjuggling_0803',title:'Hat Juggling - Multiplex & Catches',day:'20260803',start:'10:00',end:'11:00',
+  loc:'Main Hall - Black Mat',desc:'Beginner friendly. 2 hats per person if possible.',name:'Workshop wall'},
+ {id:'wall_taspasditballe_0803',title:'Cie TasPasDitBalle (street circus)',day:'20260803',start:'10:00',end:'11:00',
+  loc:'Main Hall - Upstairs Room',desc:'Workshop by Cie TasPasDitBalle, cirque de rue (cietaspasditballe.fr).',name:'Workshop wall'},
+ {id:'wall_multiplexpassing_0803',title:'Multiplex Passing with Balls (Oskaras)',day:'20260803',start:'10:00',end:'11:00',
+  loc:'Passing Zone (24-hour hall)',desc:'Level: beginner. Prereq: solid 3-ball cascade. Contents: 7-ball for 2 people, patterns for 3+, rotations, entering & exiting on the fly. Part 1 of 3.',name:'Workshop wall'},
+ {id:'wall_diabolo_steve_0803',title:'Diabolo Tricks with Steve (1 diabolo)',day:'20260803',start:'10:00',end:'11:00',
+  loc:'Juggling Hall - Black Mat',desc:'Beginner + intermediate.',name:'Workshop wall'},
+ {id:'wall_shivapassing_0803',title:'Shiva Passing - Clubs',day:'20260803',start:'11:00',end:'13:00',
+  loc:'Main Hall - Red Mat',desc:'0-3 clubs, 2 people. Beginners. Solo & duo techniques. shiva.passing.net',name:'Workshop wall'},
+ {id:'wall_3balltricks_kev_0803',title:'3-Ball Tricks for Beginners with Kev',day:'20260803',start:'11:00',end:'12:00',
+  loc:'Main Hall - Black Mat',desc:'Learn cool tricks to impress your friends and your cat. Your skills: hold a cascade for 20 seconds.',name:'Workshop wall'},
+ {id:'wall_sequencing_trahair_0803',title:'Sequencing I (Beginners) - Anthony Trahair',day:'20260803',start:'11:00',end:'12:00',
+  loc:'Main Hall - Upstairs Room',desc:'Balls/clubs, from the beginning. By Anthony Trahair, pearlsofjuggling.com.',name:'Workshop wall'},
+ {id:'wall_joggling_trials_0803',title:'Joggling Time Trials (drop-in)',day:'20260803',start:'11:00',end:'12:00',
+  loc:'Athlete Track (SC Ptuj)',desc:'With Scott and Dom. Test your speed & stamina on the track - balls/clubs, 100m/400m. Drop in any time.',name:'Workshop wall'},
+ {id:'wall_fanx_0803',title:'FAN X - Juggling Fans',day:'20260803',start:'12:00',end:'13:00',
+  loc:'Main Hall - Red Mat',desc:'The next evolution of juggling fans: juggling/manipulation/flow. Open for all levels, folding fan. Come as you are.',name:'Workshop wall'},
+ {id:'wall_millsmess_kev_0803',title:'Mills Mess for "free" - 3 Tricks with Kev',day:'20260803',start:'12:00',end:'12:20',
+  loc:'Main Hall - Black Mat',desc:'Learn 3 tricks to get Mills Mess for free. Your skills: 3-ball cascade for 1 minute and some first tricks. Short 20-minute workshop.',name:'Workshop wall'},
+ {id:'wall_6countpopcorn_0803',title:'6-Count Popcorn (Club Passing)',day:'20260803',start:'12:00',end:'13:00',
+  loc:'Passing Zone (24-hour hall)',desc:'7-club passing pattern including hefs and doubles. Easier build-up patterns towards 6-count popcorn are provided.',name:'Workshop wall'},
  {id:'wall_combat_wnb_0803',title:'Combat for Women & Non-binary People',day:'20260803',start:'13:00',end:'15:00',
-  loc:'Main Hall',desc:'All levels. Requirements: 3-club cascade - bring your own clubs.',name:'Workshop wall'}
+  loc:'Main Hall',desc:'All levels. Requirements: 3-club cascade - bring your own clubs. Hosted by Merel, Clarissa & Wiebke.',name:'Workshop wall'},
+ {id:'wall_fanflow_0803',title:'Fans Workshop - Intro to Fan Flow',day:'20260803',start:'13:00',end:'14:00',
+  loc:'Main Hall - Black Mat',desc:'Introduction to fan flow: open & close grip, weaves.',name:'Workshop wall'},
+ {id:'wall_diabolo_simon_0803',title:'Diabolo for Beginners with Simon',day:'20260803',start:'14:00',end:'15:00',
+  loc:'Main Hall - Black Mat',desc:'Bring your own diabolo.',name:'Workshop wall'}
 ];
 function toggleWsForm(){
   if(!db){document.getElementById('wsmsg').textContent='';alert('Posting workshops needs an internet connection.');return;}
