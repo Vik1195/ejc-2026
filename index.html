@@ -74,6 +74,8 @@ h2{color:var(--red);font-size:17px;margin:16px 4px 12px}
 .wncard ul{margin:0 0 14px;padding-left:20px}
 .wncard li{font-size:14px;margin:7px 0;color:#463d35}
 .wnbtn{display:block;width:100%;border:none;border-radius:12px;background:var(--red);color:#fff;font-weight:800;font-size:15px;padding:12px;cursor:pointer}
+.pastbtn{display:block;width:100%;margin:18px 0 6px;padding:12px;border:1px dashed #d4c6b1;border-radius:13px;background:#f6efe2;color:#8a7d70;font-weight:700;font-size:14px;cursor:pointer;text-align:left}
+#pastbody .card{opacity:.65}
 footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px}
 </style></head><body>
 <header><h1>EJC 2026 &middot; Ptuj</h1><p>48th European Juggling Convention &middot; 1&ndash;9 August 2026 &middot; Slovenia</p></header>
@@ -92,6 +94,7 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px}
 <li><b>Two sections</b> up top: Events and Workshops.</li>
 <li><b>Workshops by day:</b> pick a day, see the workshops, post the ones you spot on the wall.</li>
 <li><b>My Plan</b> now lives behind the big &#9733; button at the bottom &ndash; your shows, workshops and calendar export in one place.</li>
+<li><b>Tidier plan:</b> anything that's already over folds away under "Past" &ndash; tap to peek back.</li>
 </ul>
 <button class="wnbtn" onclick="dismissWn()">Got it!</button>
 </div></div>
@@ -181,20 +184,51 @@ var DAYNAMES={};
 document.querySelectorAll('.wrap > .panel').forEach(function(p){
   var h=p.querySelector('h2'); if(p.id!=='day-plan'&&h){DAYNAMES[p.id.replace('day-','')]=h.textContent;}
 });
+var pastOpen=false;
+function isPastCard(c){
+  var now=new Date();
+  function pad(n){return (n<10?'0':'')+n;}
+  var nowStr=''+now.getFullYear()+pad(now.getMonth()+1)+pad(now.getDate())+'T'+pad(now.getHours())+pad(now.getMinutes())+'00';
+  var end=c.getAttribute('data-end');
+  if(end){return end<nowStr;}
+  var day=c.getAttribute('data-day');
+  return day && (day < nowStr.slice(0,8));
+}
+function togglePast(){
+  pastOpen=!pastOpen;
+  var pb=document.getElementById('pastbody'); if(pb)pb.style.display=pastOpen?'block':'none';
+  var bt=document.getElementById('pastbtn'); if(bt)bt.innerHTML=(pastOpen?'&#9662;':'&#9656;')+' Past ('+bt.getAttribute('data-n')+')';
+}
 function renderPlan(){
   var body=document.getElementById('planbody'); body.innerHTML='';
-  var count=0;
+  var upcoming=0, past=0;
+  var pastWrap=document.createElement('div');
+  var pastBody=document.createElement('div'); pastBody.id='pastbody'; pastBody.style.display=pastOpen?'block':'none';
   document.querySelectorAll('.wrap > .panel:not(#day-plan)').forEach(function(p){
-    var dayCards=[];
+    var up=[], pa=[];
     p.querySelectorAll('.card').forEach(function(c){
-      if(favs[c.getAttribute('data-eid')]){dayCards.push(c);}
+      if(!favs[c.getAttribute('data-eid')])return;
+      (isPastCard(c)?pa:up).push(c);
     });
-    if(dayCards.length){
+    function addGroup(target,cards){
+      if(!cards.length)return 0;
       var h=document.createElement('div'); h.className='planday';
-      h.textContent=DAYNAMES[p.id.replace('day-','')]||''; body.appendChild(h);
-      dayCards.forEach(function(c){var cl=c.cloneNode(true); cl.classList.remove('hide'); cl.classList.remove('wsdayhide'); body.appendChild(cl); count++;});
+      h.textContent=DAYNAMES[p.id.replace('day-','')]||''; target.appendChild(h);
+      cards.forEach(function(c){var cl=c.cloneNode(true); cl.classList.remove('hide'); cl.classList.remove('wsdayhide'); target.appendChild(cl);});
+      return cards.length;
     }
+    upcoming+=addGroup(body,up);
+    past+=addGroup(pastBody,pa);
   });
+  if(past){
+    var bt=document.createElement('button'); bt.className='pastbtn'; bt.id='pastbtn';
+    bt.setAttribute('data-n',past);
+    bt.innerHTML=(pastOpen?'&#9662;':'&#9656;')+' Past ('+past+')';
+    bt.onclick=togglePast;
+    pastWrap.appendChild(bt); pastWrap.appendChild(pastBody);
+    body.appendChild(pastWrap);
+  }
+  var count=upcoming+past;
   document.getElementById('planempty').style.display=count?'none':'block';
   document.getElementById('exportbtn').style.display=count?'block':'none';
   refreshFavUI();
@@ -377,7 +411,7 @@ function initFirebase(){
 initFirebase();
 
 // ---- What's new (shown once per version) ----
-var APP_VERSION='3';
+var APP_VERSION='4';
 function dismissWn(){
   document.getElementById('whatsnew').style.display='none';
   try{localStorage.setItem('ejcVer',APP_VERSION);}catch(e){}
