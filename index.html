@@ -330,6 +330,11 @@ function escHtml(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').
 var WSDAY={20260802:'Sunday, 2 August',20260803:'Monday, 3 August',20260804:'Tuesday, 4 August',
  20260805:'Wednesday, 5 August',20260806:'Thursday, 6 August',20260807:'Friday, 7 August',20260808:'Saturday, 8 August'};
 var wsList=[];
+// Workshops transcribed from the physical workshop wall (updated via deploy)
+var WALL=[
+ {id:'wall_combat_wnb_0803',title:'Combat for Women & Non-binary People',day:'20260803',start:'13:00',end:'15:00',
+  loc:'Main Hall',desc:'All levels. Requirements: 3-club cascade - bring your own clubs.',name:'Workshop wall'}
+];
 function toggleWsForm(){
   if(!db){document.getElementById('wsmsg').textContent='';alert('Posting workshops needs an internet connection.');return;}
   var f=document.getElementById('wsform');
@@ -372,13 +377,14 @@ function submitWorkshop(){
 }
 function renderWorkshops(){
   var body=document.getElementById('wsbody'); body.innerHTML='';
+  var all=WALL.concat(wsList);
   var wc=document.getElementById('wscount');
-  if(wc)wc.textContent=wsList.length?('('+wsList.length+')'):'';
+  if(wc)wc.textContent=all.length?('('+all.length+')'):'';
   var em=document.createElement('p'); em.className='planhint'; em.id='wsdayempty';
   em.textContent='No workshops posted for this day yet - spotted one on the wall? Add it!';
   em.style.display='none'; body.appendChild(em);
   var byDay={};
-  wsList.forEach(function(w){(byDay[w.day]=byDay[w.day]||[]).push(w);});
+  all.forEach(function(w){(byDay[w.day]=byDay[w.day]||[]).push(w);});
   Object.keys(byDay).sort().forEach(function(day){
     var h=document.createElement('div'); h.className='planday';
     h.setAttribute('data-wsday',day);
@@ -452,6 +458,7 @@ try{
   }
 }catch(e){}
 
+renderWorkshops();
 render();
 </script>
 </body></html>
