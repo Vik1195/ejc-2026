@@ -256,22 +256,27 @@ function renderPlan(){
   var upcoming=0, past=0;
   var pastWrap=document.createElement('div');
   var pastBody=document.createElement('div'); pastBody.id='pastbody'; pastBody.style.display=pastOpen?'block':'none';
-  document.querySelectorAll('.wrap > .panel:not(#day-plan)').forEach(function(p){
-    var up=[], pa=[];
-    p.querySelectorAll('.card').forEach(function(c){
-      if(!favs[c.getAttribute('data-eid')])return;
-      (isPastCard(c)?pa:up).push(c);
-    });
-    function addGroup(target,cards){
-      if(!cards.length)return 0;
-      var h=document.createElement('div'); h.className='planday';
-      h.textContent=DAYNAMES[p.id.replace('day-','')]||''; target.appendChild(h);
-      cards.forEach(function(c){var cl=c.cloneNode(true); cl.classList.remove('hide'); cl.classList.remove('wsdayhide'); target.appendChild(cl);});
-      return cards.length;
-    }
-    upcoming+=addGroup(body,up);
-    past+=addGroup(pastBody,pa);
+  var byDayUp={}, byDayPa={};
+  document.querySelectorAll('.wrap > .panel:not(#day-plan) .card').forEach(function(c){
+    if(!favs[c.getAttribute('data-eid')])return;
+    var d=c.getAttribute('data-day')||'';
+    var tgt=isPastCard(c)?byDayPa:byDayUp;
+    (tgt[d]=tgt[d]||[]).push(c);
   });
+  function addGroups(target,byDay){
+    var n=0;
+    Object.keys(byDay).sort().forEach(function(day){
+      var cards=byDay[day].slice().sort(function(a,b){
+        return (a.getAttribute('data-start')||'').localeCompare(b.getAttribute('data-start')||'');});
+      var h=document.createElement('div'); h.className='planday';
+      h.textContent=DAYNAMES[day]||day; target.appendChild(h);
+      cards.forEach(function(c){var cl=c.cloneNode(true); cl.classList.remove('hide'); cl.classList.remove('wsdayhide'); cl.classList.remove('wsareahide'); target.appendChild(cl);});
+      n+=cards.length;
+    });
+    return n;
+  }
+  upcoming=addGroups(body,byDayUp);
+  past=addGroups(pastBody,byDayPa);
   if(past){
     var bt=document.createElement('button'); bt.className='pastbtn'; bt.id='pastbtn';
     bt.setAttribute('data-n',past);
