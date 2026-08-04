@@ -809,7 +809,15 @@ function dismissWn(){
   try{localStorage.setItem('ejcVer',APP_VERSION);}catch(e){}
 }
 try{
+  var opens=(parseInt(localStorage.getItem('ejcOpens')||'0',10)||0)+1;
+  localStorage.setItem('ejcOpens',String(opens));
   if(localStorage.getItem('ejcVer')!==APP_VERSION){
+    document.getElementById('whatsnew').style.display='flex';
+  }else if(opens>=5 && !localStorage.getItem('ejcDrinkAsk1')){
+    localStorage.setItem('ejcDrinkAsk1','1');
+    document.getElementById('whatsnew').style.display='flex';
+  }else if(TODAY>='20260808' && TODAY<='20260809' && !localStorage.getItem('ejcDrinkAsk2')){
+    localStorage.setItem('ejcDrinkAsk2','1');
     document.getElementById('whatsnew').style.display='flex';
   }
 }catch(e){}
