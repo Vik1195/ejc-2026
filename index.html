@@ -128,6 +128,7 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 <button class="segbtn segmap" id="seg-map" onclick="setSection('map')">&#128205; Map</button>
 </div>
 <div class="searchrow" id="searchrow"><input id="searchbox" type="search" placeholder="&#128269; Search events &amp; workshops (all days)..." oninput="onSearchInput(this.value)"><button class="searchclear" id="searchclear" style="display:none" onclick="clearSearch()">&#10005;</button></div>
+<button class="pastbtn hidden" id="searchpastbtn" style="margin:6px 12px 0;width:auto;display:block" onclick="toggleSearchPast()"></button>
 <div class="tabs"><button class='tab pastdaybtn hidden' id='pasttabsbtn' onclick='togglePastDays()'><span class='wd'>&#9203;</span><span class='dn'>Past</span></button><button class='tab active' onclick="showDay('20260801')" id='tab-20260801'><span class='wd'>Sat</span><span class='dn'>Aug 1</span></button><button class='tab' onclick="showDay('20260802')" id='tab-20260802'><span class='wd'>Sun</span><span class='dn'>Aug 2</span></button><button class='tab' onclick="showDay('20260803')" id='tab-20260803'><span class='wd'>Mon</span><span class='dn'>Aug 3</span></button><button class='tab' onclick="showDay('20260804')" id='tab-20260804'><span class='wd'>Tue</span><span class='dn'>Aug 4</span></button><button class='tab' onclick="showDay('20260805')" id='tab-20260805'><span class='wd'>Wed</span><span class='dn'>Aug 5</span></button><button class='tab' onclick="showDay('20260806')" id='tab-20260806'><span class='wd'>Thu</span><span class='dn'>Aug 6</span></button><button class='tab' onclick="showDay('20260807')" id='tab-20260807'><span class='wd'>Fri</span><span class='dn'>Aug 7</span></button><button class='tab' onclick="showDay('20260808')" id='tab-20260808'><span class='wd'>Sat</span><span class='dn'>Aug 8</span></button><button class='tab' onclick="showDay('20260809')" id='tab-20260809'><span class='wd'>Sun</span><span class='dn'>Aug 9</span></button></div>
 <div class="legend"><button class='leg active' data-cat='show' onclick="toggleCat(this,'show')"><span class='dot' style='background:#e23b2e'></span>Shows & Stage</button><button class='leg active' data-cat='music' onclick="toggleCat(this,'music')"><span class='dot' style='background:#c07a24'></span>Music & Party</button><button class='leg active' data-cat='tournament' onclick="toggleCat(this,'tournament')"><span class='dot' style='background:#3f6b6b'></span>Tournaments</button><button class='leg active' data-cat='workshop' onclick="toggleCat(this,'workshop')"><span class='dot' style='background:#4a8f5b'></span>Workshops & Talks</button><button class='leg active' data-cat='kids' onclick="toggleCat(this,'kids')"><span class='dot' style='background:#c0397f'></span>Kids</button><button class='leg active' data-cat='info' onclick="toggleCat(this,'info')"><span class='dot' style='background:#7a6f66'></span>Info & Parade</button></div>
 <div class="hint">Tap an event for details &middot; tap &#9734; to add it to My Plan</div>
@@ -209,12 +210,16 @@ function render(){
     document.getElementById('day-plan').classList.add('show'); renderPlan();
     tabs.classList.add('hidden'); legend.classList.add('hidden'); hint.classList.add('hidden'); seg.classList.add('hidden');
     var sr2=document.getElementById('searchrow'); if(sr2)sr2.classList.add('hidden');
+    var spb2=document.getElementById('searchpastbtn'); if(spb2)spb2.classList.add('hidden');
     document.getElementById('planbar').innerHTML='&#8592; Back to program';
   }else{
     document.getElementById('planbar').innerHTML='&#9733; My Plan <span class="plancnt" id="plancount">0</span>';
     seg.classList.remove('hidden');
     var sr=document.getElementById('searchrow');
     if(sr)sr.classList.toggle('hidden', currentSection==='map'||currentSection==='rides');
+    if(currentSection==='map'||currentSection==='rides'){
+      var spb=document.getElementById('searchpastbtn'); if(spb)spb.classList.add('hidden');
+    }
     if(currentSection==='map'){
       tabs.classList.add('hidden'); legend.classList.add('hidden'); hint.classList.add('hidden');
       document.getElementById('day-map').classList.add('show');
@@ -275,10 +280,22 @@ function applyWsDayFilter(){
   applyWsAreaFilter();
 }
 // ---- Search & workshop type filter (v12) ----
-var searchQ='';
+var searchQ=''; var searchPastOpen=false;
 function onSearchInput(v){
   searchQ=(v||'').trim().toLowerCase();
   var cb=document.getElementById('searchclear'); if(cb)cb.style.display=searchQ?'':'none';
+  if(!searchQ){searchPastOpen=false; updateSearchPastBtn(0);}
+  if(currentSection==='events'){applyEventSearch();}
+  else if(currentSection==='ws'){applyWsDayFilter();}
+}
+function updateSearchPastBtn(n){
+  var b=document.getElementById('searchpastbtn'); if(!b)return;
+  if(!searchQ||!n){b.classList.add('hidden');return;}
+  b.classList.remove('hidden');
+  b.innerHTML=searchPastOpen?'&#9662; Hide past results':('&#9656; Show '+n+' past result'+(n===1?'':'s'));
+}
+function toggleSearchPast(){
+  searchPastOpen=!searchPastOpen;
   if(currentSection==='events'){applyEventSearch();}
   else if(currentSection==='ws'){applyWsDayFilter();}
 }
@@ -297,16 +314,21 @@ function applyEventSearch(){
     document.querySelectorAll('.searchhide').forEach(function(c){c.classList.remove('searchhide');});
     render(); return;
   }
+  var pastN=0;
   document.querySelectorAll('.wrap > .panel').forEach(function(p){
     if(!/^day-\d{8}$/.test(p.id)){p.classList.remove('show');return;}
     var any=false;
     p.querySelectorAll('.card').forEach(function(c){
       var m=cardMatches(c);
-      c.classList.toggle('searchhide',!m);
-      if(m)any=true;
+      var past=m&&isPastCard(c);
+      if(past)pastN++;
+      var show=m&&(!past||searchPastOpen);
+      c.classList.toggle('searchhide',!show);
+      if(show)any=true;
     });
     p.classList.toggle('show',any);
   });
+  updateSearchPastBtn(pastN);
 }
 var wsType='all';
 function wsTypeFromText(title,desc){
@@ -345,13 +367,17 @@ function setWsArea(btn){wsArea=btn.getAttribute('data-area');
   document.querySelectorAll('.areachip').forEach(function(b){b.classList.toggle('on',b===btn);});
   applyWsAreaFilter();}
 function applyWsAreaFilter(){
+  var pastN=0;
   document.querySelectorAll('#wsbody .card').forEach(function(c){
     var a=wsAreaOf(c.getAttribute('data-loc'));
     var hideArea = wsArea!=='all' && a!==wsArea;
     var hideType = wsType!=='all' && (c.getAttribute('data-wstype')||'other')!==wsType;
     var hideSearch = !cardMatches(c);
-    c.classList.toggle('wsareahide', hideArea||hideType||hideSearch);
+    var isPast = searchQ && !hideArea && !hideType && !hideSearch && isPastCard(c);
+    if(isPast)pastN++;
+    c.classList.toggle('wsareahide', hideArea||hideType||hideSearch||(isPast&&!searchPastOpen));
   });
+  if(currentSection==='ws')updateSearchPastBtn(pastN);
   var dayHas={};
   document.querySelectorAll('#wsbody .card').forEach(function(c){
     if(!c.classList.contains('wsareahide') && !c.classList.contains('wsdayhide')){
