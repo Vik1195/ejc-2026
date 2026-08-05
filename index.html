@@ -161,7 +161,7 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 </div></div>
 <div class="wn" id="verupd" style="display:none"><div class="wncard">
 <h3>&#127381; What's new</h3>
-<p class="wnnote"><b>New in version 12:</b> &#128663; <b>Rides</b> - offer a lift or find one, to or from the EJC! Post your ride with seats, costs, props space and contact - only you can update your seats. Tap <i>Show contact</i> to reach the driver directly. And now with a &#128506; <b>map view</b>: see all ride destinations as pins on a map!</p>
+<p class="wnnote"><b>New in version 11:</b> &#128663; <b>Rides</b> - offer a lift or find one, to or from the EJC! Post your ride with seats, costs, props space and contact - only you can update your seats. Tap <i>Show contact</i> to reach the driver directly. And now with a &#128506; <b>map view</b>: see all ride destinations as pins on a map!</p>
 <p class="wnnote"><b>Also new:</b> Workshop <b>organizers</b> can edit their workshops (&#9999;&#65039; on the card) when time or location changes - and starred workshops notify you about changes.</p>
 <button class="wnbtn" onclick="dismissVerUpd()">Got it!</button>
 </div></div>
@@ -178,7 +178,7 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 <button class="wnbtn wnghost" onclick="closeRideEdit()">Close</button>
 <p class="wsmsg" id="rideeditmsg"></p>
 </div></div>
-<footer>Based on the official schedule at ejc2026.org/program (as of 1 Aug 2026) and the EJC 2026 programme booklet. Locations open in Google Maps. All times local (Ptuj, CEST). <span id="verline">App version 12</span><br>Made with &#10084;&#65039; at EJC by Julia &amp; Viktor &middot; <a class="drinklink" href="https://www.paypal.me/ViktorLehr398" target="_blank" rel="noopener">&#127867; Buy us a drink</a><br>You want an app like that for your festival? Contact: <a class="drinklink" href="mailto:kontakt@lehrconsult.de">kontakt@lehrconsult.de</a></footer>
+<footer>Based on the official schedule at ejc2026.org/program (as of 1 Aug 2026) and the EJC 2026 programme booklet. Locations open in Google Maps. All times local (Ptuj, CEST). <span id="verline">App version 11</span><br>Made with &#10084;&#65039; at EJC by Julia &amp; Viktor &middot; <a class="drinklink" href="https://www.paypal.me/ViktorLehr398" target="_blank" rel="noopener">&#127867; Buy us a drink</a><br>You want an app like that for your festival? Contact: <a class="drinklink" href="mailto:kontakt@lehrconsult.de">kontakt@lehrconsult.de</a></footer>
 <script>
 function ymdToday(){var d=new Date();function p(n){return(n<10?'0':'')+n}return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());}
 var TODAY=ymdToday();
@@ -1463,7 +1463,7 @@ function initFirebase(){
 initFirebase();
 
 // ---- What's new (shown once per version) ----
-var APP_VERSION='12';
+var APP_VERSION='11';
 function showDrink(){document.getElementById('whatsnew').style.display='flex';}
 function dismissWn(){
   document.getElementById('whatsnew').style.display='none';
