@@ -177,6 +177,11 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 <p class="wnnote"><b>Also new:</b> Workshop <b>organizers</b> can edit their workshops (&#9999;&#65039; on the card) when time or location changes - and starred workshops notify you about changes.</p>
 <button class="wnbtn" onclick="dismissVerUpd()">Got it!</button>
 </div></div>
+<div class="wn" id="announce" style="display:none"><div class="wncard">
+<h3 id="announcetitle"></h3>
+<div id="announcebody"></div>
+<button class="wnbtn" onclick="dismissAnnounce()">Got it!</button>
+</div></div>
 <div class="wn" id="rideeditpop" style="display:none"><div class="wncard">
 <h3>&#128663; Edit my ride</h3>
 <p class="wntext" style="margin-bottom:8px"><b id="rideedittitle"></b></p>
@@ -1799,6 +1804,30 @@ try{
   }else if(TODAY>='20260808' && TODAY<='20260809' && !localStorage.getItem('ejcDrinkAsk2')){
     localStorage.setItem('ejcDrinkAsk2','1');
     document.getElementById('whatsnew').style.display='flex';
+  }
+}catch(e){}
+
+// ---- One-time broadcast announcement (edit ID + text per deploy) ----
+var ANNOUNCE_ID='volleyclub-finals-0806';
+var ANNOUNCE_UNTIL='20260806';
+var ANNOUNCE_TITLE='&#128227; Volleyclub Finals - today!';
+var ANNOUNCE_HTML='<p class="wnnote"><b>Corrected location:</b> the Volleyclub Finals Day happens at the <b>volleyclub courts behind the hall</b> - NOT at the Mestni stadion by the traders.<br><br><b>Today&#x27;s schedule:</b><br>16:30 - last quarterfinal<br>17:00 - 1st semifinal<br>17:30 - 2nd semifinal<br><b>&#127942; 18:00 - match for 3rd place + FINAL</b></p>';
+function dismissAnnounce(){
+  document.getElementById('announce').style.display='none';
+  try{localStorage.setItem('ejcAnnounce',ANNOUNCE_ID);}catch(e){}
+}
+try{
+  if(ANNOUNCE_ID && TODAY<=ANNOUNCE_UNTIL && localStorage.getItem('ejcAnnounce')!==ANNOUNCE_ID){
+    var otherOpen=false;
+    ['whatsnew','verupd'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el&&el.style.display==='flex')otherOpen=true;
+    });
+    if(!otherOpen){
+      document.getElementById('announcetitle').innerHTML=ANNOUNCE_TITLE;
+      document.getElementById('announcebody').innerHTML=ANNOUNCE_HTML;
+      document.getElementById('announce').style.display='flex';
+    }
   }
 }catch(e){}
 
