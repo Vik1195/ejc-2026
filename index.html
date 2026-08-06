@@ -457,6 +457,7 @@ function toggleFav(btn){
   if(adding && db && CREW && !myName){ if(!askName()){/* still add locally */} }
   if(adding){favs[id]=1;}else{delete favs[id];}
   saveFavs(); refreshFavUI(); syncFav(id,adding);
+  if(typeof syncCount==='function'){syncCount(id,adding);}
   if(id.indexOf('ws_')===0 && typeof checkWsChanges==='function'){checkWsChanges();}
   if(document.getElementById('day-plan').classList.contains('show')){renderPlan();}
 }
@@ -603,6 +604,28 @@ function saveName(){
   try{localStorage.setItem('ejcName',myName);}catch(e){}
   pushAllLocal();
 }
+// ---- Global going-counter via a single aggregated doc (cheap reads) ----
+var counted={};
+try{counted=JSON.parse(localStorage.getItem('ejcCounted')||'{}')||{};}catch(e){counted={};}
+function saveCounted(){try{localStorage.setItem('ejcCounted',JSON.stringify(counted));}catch(e){}}
+function syncCount(eid,on){
+  if(!db||!uid)return;
+  var o={};
+  if(on){ if(counted[eid])return; o[eid]=firebase.firestore.FieldValue.increment(1); counted[eid]=1; }
+  else{ if(!counted[eid])return; o[eid]=firebase.firestore.FieldValue.increment(-1); delete counted[eid]; }
+  saveCounted();
+  db.collection('counts').doc('going').set(o,{merge:true}).catch(function(){});
+}
+function pushCountsBackfill(){
+  if(!db||!uid)return;
+  var o={}; var any=false;
+  Object.keys(favs).forEach(function(eid){
+    if(!counted[eid]){o[eid]=firebase.firestore.FieldValue.increment(1); counted[eid]=1; any=true;}
+  });
+  if(!any)return;
+  saveCounted();
+  db.collection('counts').doc('going').set(o,{merge:true}).catch(function(){});
+}
 function syncFav(eid,on){
   if(!db||!uid||!CREW)return;
   var ref=db.collection('attendance').doc(uid+'_'+eid);
@@ -619,7 +642,13 @@ function updateGoingUI(){
     var row=c.querySelector('.rowr');
     var b=c.querySelector('.who');
     if(!b&&row){b=document.createElement('span');b.className='who';row.insertBefore(b,row.firstChild);}
-    if(b){b.innerHTML=arr.length?('&#128101; '+arr.length):'';}
+    if(b){
+      var all=goCount[eid]||0; if(all<0)all=0;
+      var h='';
+      if(arr.length){h='&#128101; '+arr.length;}
+      if(all>0){h+=(h?' ':'')+"<span class='whoall'>("+all+")</span>";}
+      b.innerHTML=h;
+    }
     var det=c.querySelector('.details');
     var g=c.querySelector('.golist');
     if(!g&&det){g=document.createElement('div');g.className='golist';det.insertBefore(g,det.firstChild);}
@@ -1849,6 +1878,11 @@ function initFirebase(){
         var wh=document.getElementById('wshint');
         if(wh)wh.textContent='Workshops are pinned to the wall daily - and posted here by the community. Spotted one? Add it so everyone can find it. Tap \u2606 to join and see who else is going.';
       }
+      db.collection('counts').doc('going').onSnapshot(function(doc){
+        goCount=(doc&&doc.exists)?(doc.data()||{}):{};
+        updateGoingUI();
+      });
+      pushCountsBackfill();
       db.collection('lostfound').onSnapshot(function(snap){
         lfList=[];
         snap.forEach(function(doc){
