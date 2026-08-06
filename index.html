@@ -1774,29 +1774,53 @@ function clearFbPhoto(){
   var i=document.getElementById('fbphoto'); if(i)i.value='';
   document.getElementById('fbphotoprev').style.display='none';
 }
+var FB_MAIL_KEY='fa699d0b-77c9-4d70-8a74-9077dcd6b7dc';
 function submitFeedback(){
   var msg=document.getElementById('fbmsg');
-  if(!db||!uid){msg.textContent='No connection - try again later.';return;}
   var text=document.getElementById('fbtext').value.trim();
   if(!fbStars && !text){msg.textContent='Please tap some stars or write a line :)';return;}
   var name=document.getElementById('fbname').value.trim();
   if(name){myName=name; try{localStorage.setItem('ejcName',name);}catch(e){}}
-  var id=uid+'_fb'+Math.floor(Math.random()*1000000);
+  var quoteOk=!!document.getElementById('fbquote').checked;
+  var hasPhoto=!!fbPhotoData;
   msg.textContent='Sending...';
-  db.collection('feedback').doc(id).set({
-    stars:fbStars||0, text:text.slice(0,400), name:name.slice(0,30),
-    quoteOk:!!document.getElementById('fbquote').checked,
-    photo:fbPhotoData||'', uid:uid, ts:Date.now()
-  }).then(function(){
-    document.getElementById('fbtext').value=''; clearFbPhoto(); setFbStars(0); fbStars=0;
-    document.getElementById('fbform').style.display='none';
-    document.getElementById('fbthanks').style.display='block';
-  }).catch(function(e){
-    var t=String(e&&e.message||e);
-    if(t.indexOf('permission')>-1||t.indexOf('insufficient')>-1){
-      msg.textContent='Sending blocked by database rules - the app organizer needs to publish the feedback rules.';
-    }else{msg.textContent='Could not send: '+t;}
-  });
+  var okAny=false, doneN=0;
+  function fbDone(ok){
+    okAny=okAny||ok; doneN++;
+    if(doneN<2)return;
+    if(okAny){
+      document.getElementById('fbtext').value=''; clearFbPhoto(); setFbStars(0); fbStars=0;
+      document.getElementById('fbform').style.display='none';
+      document.getElementById('fbthanks').style.display='block';
+    }else{
+      msg.textContent='Could not send - please check your connection and try again.';
+    }
+  }
+  // 1) Email via Web3Forms (works independently of Firebase)
+  fetch('https://api.web3forms.com/submit',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Accept':'application/json'},
+    body:JSON.stringify({
+      access_key:FB_MAIL_KEY,
+      subject:'EJC App Feedback: '+(fbStars||0)+'/5 stars'+(name?(' - '+name):''),
+      from_name:'EJC Programm App',
+      stars:(fbStars||0)+'/5',
+      feedback:text||'(no text)',
+      name:name||'(anonymous)',
+      may_quote_publicly:quoteOk?'YES':'no',
+      photo:hasPhoto?'yes - stored in Firestore collection feedback':'no',
+      botcheck:''
+    })
+  }).then(function(r){return r.json();})
+    .then(function(j){fbDone(!!(j&&j.success));})
+    .catch(function(){fbDone(false);});
+  // 2) Firestore backup (carries the photo)
+  if(db&&uid){
+    db.collection('feedback').doc(uid+'_fb'+Math.floor(Math.random()*1000000)).set({
+      stars:fbStars||0, text:text.slice(0,400), name:name.slice(0,30),
+      quoteOk:quoteOk, photo:fbPhotoData||'', uid:uid, ts:Date.now()
+    }).then(function(){fbDone(true);}).catch(function(){fbDone(false);});
+  }else{fbDone(false);}
 }
 function initFirebase(){
   if(!firebaseConfig||typeof firebase==='undefined')return;
