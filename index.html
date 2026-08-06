@@ -604,13 +604,13 @@ function saveName(){
   pushAllLocal();
 }
 function syncFav(eid,on){
-  if(!db||!uid)return;
+  if(!db||!uid||!CREW)return;
   var ref=db.collection('attendance').doc(uid+'_'+eid);
-  if(on){ref.set({eid:eid,uid:uid,room:CREW||'public',name:CREW?(myName||'Anonymous juggler'):(myName||''),ts:Date.now()}).catch(function(){});}
+  if(on){ref.set({eid:eid,uid:uid,room:CREW,name:myName||'Anonymous juggler',ts:Date.now()}).catch(function(){});}
   else{ref.delete().catch(function(){});}
 }
 function pushAllLocal(){
-  if(!db||!uid)return;
+  if(!db||!uid||!CREW)return;
   Object.keys(favs).forEach(function(eid){syncFav(eid,true);});
 }
 function updateGoingUI(){
@@ -619,13 +619,7 @@ function updateGoingUI(){
     var row=c.querySelector('.rowr');
     var b=c.querySelector('.who');
     if(!b&&row){b=document.createElement('span');b.className='who';row.insertBefore(b,row.firstChild);}
-    if(b){
-      var all=goCount[eid]||0;
-      var h='';
-      if(arr.length){h='&#128101; '+arr.length;}
-      if(all>0){h+=(h?' ':'')+"<span class='whoall'>("+all+")</span>";}
-      b.innerHTML=h;
-    }
+    if(b){b.innerHTML=arr.length?('&#128101; '+arr.length):'';}
     var det=c.querySelector('.details');
     var g=c.querySelector('.golist');
     if(!g&&det){g=document.createElement('div');g.className='golist';det.insertBefore(g,det.firstChild);}
@@ -1818,18 +1812,17 @@ function initFirebase(){
         var nb=document.getElementById('namebox'); if(nb)nb.style.display='block';
         var inp=document.getElementById('nameinput'); if(inp)inp.value=myName;
         var cl=document.getElementById('crewlabel'); if(cl)cl.textContent=CREW;
+        db.collection('attendance').where('room','==',CREW).onSnapshot(function(snap){
+          going={};
+          snap.forEach(function(doc){
+            var d=doc.data(); if(!d||!d.eid)return;
+            (going[d.eid]=going[d.eid]||[]).push(d.name||'Anonymous');
+          });
+          updateGoingUI();
+        });
         var wh=document.getElementById('wshint');
         if(wh)wh.textContent='Workshops are pinned to the wall daily - and posted here by the community. Spotted one? Add it so everyone can find it. Tap \u2606 to join and see who else is going.';
       }
-      db.collection('attendance').onSnapshot(function(snap){
-        going={}; goCount={};
-        snap.forEach(function(doc){
-          var d=doc.data(); if(!d||!d.eid)return;
-          goCount[d.eid]=(goCount[d.eid]||0)+1;
-          if(CREW && d.room===CREW){(going[d.eid]=going[d.eid]||[]).push(d.name||'Anonymous');}
-        });
-        updateGoingUI();
-      });
       db.collection('lostfound').onSnapshot(function(snap){
         lfList=[];
         snap.forEach(function(doc){
