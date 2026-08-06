@@ -1756,7 +1756,10 @@ function initFirebase(){
           if(d.wallOverride){ if(d.wallId)wallOverrides[d.wallId]=d; return; }
           if(!d.title||!d.day)return;
           if(/\b(lost|found)\b/i.test(d.title)){
-            lfFromWs.push({id:doc.id,type:/\bfound\b/i.test(d.title)?'found':'lost',
+            // 'found' only for real find announcements ("Found: blue jacket");
+            // questions like "Have you found ...?" are lost posts
+            var lfType=(/^found\b/i.test(d.title)||/\bi found\b/i.test(d.title))&&!/\?/.test(d.title)?'found':'lost';
+            lfFromWs.push({id:doc.id,type:lfType,
               item:d.title,desc:(d.desc||'')+(d.loc?(' ('+d.loc+')'):''),name:d.name||'',resolved:false,fromWs:true,ts:0});
             return;
           }
