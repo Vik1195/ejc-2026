@@ -154,20 +154,20 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 <p class="wncontact">You want an app like that for your festival?<br>Contact: <a href="mailto:kontakt@lehrconsult.de">kontakt@lehrconsult.de</a></p>
 </div></div>
 <div class="wn" id="orgask" style="display:none"><div class="wncard">
-<h3>&#9999;&#65039; Edit workshop</h3>
-<p class="wntext"><b id="orgaskname"></b><br><br>Are you the organizer of this workshop?<br>Only the organizer should edit a workshop - e.g. when the time or location has changed, or when it has to be cancelled.</p>
+<h3 id="orgasktitle">&#9999;&#65039; Edit workshop</h3>
+<p class="wntext"><b id="orgaskname"></b><br><br>Are you the organizer of this <span id="orgaskkind">workshop</span>?<br><b>Only the organizer</b> should edit it - e.g. when the time or location has changed, or when it has to be cancelled. Everyone using the app sees your change.</p>
 <button class="wnbtn" onclick="orgYes()">Yes, I'm the organizer</button>
 <div style="height:8px"></div>
 <button class="wnbtn wnghost" onclick="closeOrgAsk()">No - go back</button>
 </div></div>
 <div class="wn" id="wseditpop" style="display:none"><div class="wncard">
-<h3>&#9999;&#65039; Edit workshop</h3>
+<h3 id="wsedittitlehead">&#9999;&#65039; Edit workshop</h3>
 <p class="wntext" style="margin-bottom:8px"><b id="wsedittitle"></b></p>
 <div class="wsrow"><label class="wstlbl">Start<input id="wseditstart" type="time"></label> <label class="wstlbl">End<input id="wseditend" type="time"></label></div>
 <div class="wsrow"><input id="wseditloc" maxlength="60" placeholder="Location" style="flex:1;min-width:180px"></div>
 <button class="wnbtn" onclick="saveWsEdit()">Save changes</button>
 <div style="height:8px"></div>
-<button class="wnbtn wnghost" style="color:#992c31;border-color:#992c31" onclick="cancelWorkshopFromEdit()">Cancel this workshop</button>
+<button class="wnbtn wnghost" style="color:#992c31;border-color:#992c31" id="wscancelbtn" onclick="cancelWorkshopFromEdit()">Cancel this workshop</button>
 <div style="height:8px"></div>
 <button class="wnbtn wnghost" onclick="closeWsEdit()">Close</button>
 <p class="wsmsg" id="wseditmsg"></p>
@@ -179,7 +179,8 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 </div></div>
 <div class="wn" id="verupd" style="display:none"><div class="wncard">
 <h3>&#127381; What's new</h3>
-<p class="wnnote"><b>New in version 14:</b> &#128172; <b>Feedback</b> - tap the speech bubble at the top left and tell us what you love and what we should improve. A photo of your favourite EJC moment is very welcome! &#127914;</p>
+<p class="wnnote"><b>New in version 15:</b> &#9999;&#65039; <b>Events can now be edited</b> - if you <b>organize</b> an event, tap <i>Edit event</i> on its card to update the time or location, or cancel it. <b>Only organizers</b> should do this - everyone using the app sees the change.</p>
+<p class="wnnote"><b>Also new:</b> &#128172; <b>Feedback</b> - tap the speech bubble at the top left and tell us what you love and what we should improve. A photo of your favourite EJC moment is very welcome! &#127914;</p>
 <p class="wnnote"><b>Also new:</b> &#129523; <b>Lost &amp; Found</b> (with photos) - and ride posters can switch their post between offer and request.</p>
 <p class="wnnote"><b>Also new:</b> &#128269; <b>Search</b> events &amp; workshops by keyword and filter workshops by <b>type</b> - Poi, Passing, Staff &amp; Fire, Acro and more.</p>
 <p class="wnnote"><b>Also new:</b> &#128663; <b>Rides</b> - offer a lift or find one, to or from the EJC! Post your ride with seats, costs, props space and contact - only you can update your seats. Tap <i>Show contact</i> to reach the driver directly. And now with a &#128506; <b>map view</b>: see all ride destinations as pins on a map!</p>
@@ -227,7 +228,7 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 <button class="wnbtn wnghost" onclick="closeRideEdit()">Close</button>
 <p class="wsmsg" id="rideeditmsg"></p>
 </div></div>
-<footer>Based on the official schedule at ejc2026.org/program (as of 1 Aug 2026) and the EJC 2026 programme booklet. Locations open in Google Maps. All times local (Ptuj, CEST). <span id="verline">App version 14</span><br>Made with &#10084;&#65039; at EJC by Julia &amp; Viktor &middot; <a class="drinklink" href="https://www.paypal.me/ViktorLehr398" target="_blank" rel="noopener">&#127867; Buy us a drink</a><br>You want an app like that for your festival? Contact: <a class="drinklink" href="mailto:kontakt@lehrconsult.de">kontakt@lehrconsult.de</a></footer>
+<footer>Based on the official schedule at ejc2026.org/program (as of 1 Aug 2026) and the EJC 2026 programme booklet. Locations open in Google Maps. All times local (Ptuj, CEST). <span id="verline">App version 15</span><br>Made with &#10084;&#65039; at EJC by Julia &amp; Viktor &middot; <a class="drinklink" href="https://www.paypal.me/ViktorLehr398" target="_blank" rel="noopener">&#127867; Buy us a drink</a><br>You want an app like that for your festival? Contact: <a class="drinklink" href="mailto:kontakt@lehrconsult.de">kontakt@lehrconsult.de</a></footer>
 <script>
 function ymdToday(){var d=new Date();function p(n){return(n<10?'0':'')+n}return ''+d.getFullYear()+p(d.getMonth()+1)+p(d.getDate());}
 var TODAY=ymdToday();
@@ -1197,6 +1198,108 @@ function deleteWorkshop(id){
     if(favs[eid]){delete favs[eid]; saveFavs(); syncFav(eid,false); refreshFavUI();}
   }).catch(function(e){alert('Could not delete: '+(e&&e.message||e));});
 }
+// ---- Event editing by organizers (overrides on the static cards) ----
+var evOverrides={};
+function evCards(){
+  return document.querySelectorAll(".wrap > .panel[id^='day-2026'] .card");
+}
+function stampEventOriginals(){
+  evCards().forEach(function(c){
+    if(c.getAttribute('data-ostart')!==null)return;
+    c.setAttribute('data-ostart', c.getAttribute('data-start')||'');
+    c.setAttribute('data-oend', c.getAttribute('data-end')||'');
+    c.setAttribute('data-oloc', c.getAttribute('data-loc')||'');
+    var t=c.querySelector('.time'); c.setAttribute('data-otime', t?t.textContent:'');
+    var ch=c.querySelector('.chip');
+    c.setAttribute('data-ochip', ch?ch.textContent:'');
+    c.setAttribute('data-ochipbg', ch?ch.style.background:'');
+    c.setAttribute('data-otimecol', t?t.style.color:'');
+    c.setAttribute('data-oborder', c.style.borderLeftColor||'');
+  });
+}
+function evStamp(day,hhmm){
+  return day+'T'+String(hhmm||'').replace(':','')+'00';
+}
+function applyEventOverrides(){
+  stampEventOriginals();
+  evCards().forEach(function(c){
+    var eid=c.getAttribute('data-eid'); if(!eid)return;
+    var o=evOverrides[eid];
+    var t=c.querySelector('.time'), ch=c.querySelector('.chip'), a=c.querySelector('.cl a');
+    var day=c.getAttribute('data-day')||'';
+    // reset to original first
+    c.setAttribute('data-start', c.getAttribute('data-ostart'));
+    c.setAttribute('data-end', c.getAttribute('data-oend'));
+    c.setAttribute('data-loc', c.getAttribute('data-oloc'));
+    if(t){t.textContent=c.getAttribute('data-otime'); t.style.color=c.getAttribute('data-otimecol');}
+    if(ch){ch.textContent=c.getAttribute('data-ochip'); ch.style.background=c.getAttribute('data-ochipbg');}
+    c.style.borderLeftColor=c.getAttribute('data-oborder');
+    c.classList.remove('wscancelled');
+    var note=c.querySelector('.evnote'); if(note)note.parentNode.removeChild(note);
+    if(a){
+      var ol=c.getAttribute('data-oloc');
+      a.textContent=ol;
+      a.setAttribute('href','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(ol+' Ptuj'));
+    }
+    if(!o)return;
+    var changed=[];
+    if(o.start){
+      var end=o.end||o.start;
+      var eDay=day;
+      if(end<=o.start){
+        var d=new Date(+day.slice(0,4), +day.slice(4,6)-1, +day.slice(6,8)+1);
+        eDay=''+d.getFullYear()+('0'+(d.getMonth()+1)).slice(-2)+('0'+d.getDate()).slice(-2);
+      }
+      c.setAttribute('data-start', evStamp(day,o.start));
+      c.setAttribute('data-end', evStamp(eDay,end));
+      if(t)t.textContent=o.start+'–'+end;
+      changed.push('new time');
+    }
+    if(o.loc){
+      c.setAttribute('data-loc', o.loc);
+      if(a){
+        a.textContent=o.loc;
+        a.setAttribute('href','https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(o.loc+' Ptuj'));
+      }
+      changed.push('new location');
+    }
+    if(o.cancelled){
+      c.classList.add('wscancelled');
+      c.style.borderLeftColor='#992c31';
+      if(t)t.style.color='#992c31';
+      if(ch){ch.textContent='CANCELLED'; ch.style.background='#992c31';}
+      changed=['CANCELLED'];
+    }
+    var det=c.querySelector('.details');
+    if(det && changed.length){
+      var n=document.createElement('div');
+      n.className='evnote wscreator';
+      n.textContent='✏️ Updated by the organizers: '+changed.join(', ')+(o.editedBy?(' ('+o.editedBy+')'):'');
+      det.insertBefore(n, det.firstChild);
+    }
+  });
+  if(typeof refreshFavUI==='function')refreshFavUI();
+}
+function addEventEditButtons(){
+  evCards().forEach(function(c){
+    if(c.querySelector('.wsedit'))return;
+    var det=c.querySelector('.details'); if(!det)return;
+    var b=document.createElement('button');
+    b.className='wsedit'; b.innerHTML='&#9999;&#65039; Edit event (organizers)';
+    b.onclick=(function(card){return function(e){
+      e.stopPropagation();
+      var eid=card.getAttribute('data-eid');
+      var o=evOverrides[eid]||{};
+      var st=(o.start||'')||(card.getAttribute('data-ostart')||'').slice(9,13);
+      var en=(o.end||'')||(card.getAttribute('data-oend')||'').slice(9,13);
+      function fmt(x){return (x&&x.length===4)?(x.slice(0,2)+':'+x.slice(2)):x;}
+      requestWsEdit({kind:'event', id:eid,
+        title:(card.getAttribute('data-title')||'').replace(/ \(workshop\)$/,''),
+        start:fmt(st), end:fmt(en), loc:o.loc||card.getAttribute('data-oloc')||''});
+    };})(c);
+    det.appendChild(b);
+  });
+}
 // ---- Workshop editing & update notifications (v10) ----
 var wallOverrides={}; var wsLoaded=false; var editTarget=null;
 var WALLIDS={}; WALL.forEach(function(w){WALLIDS[w.id]=1;});
@@ -1209,6 +1312,9 @@ function applyWallOverride(w){
 }
 function requestWsEdit(wi){
   editTarget=wi;
+  var isEv=(wi.kind==='event');
+  document.getElementById('orgasktitle').innerHTML='&#9999;&#65039; Edit '+(isEv?'event':'workshop');
+  document.getElementById('orgaskkind').textContent=isEv?'event':'workshop';
   document.getElementById('orgaskname').textContent=wi.title;
   document.getElementById('orgask').style.display='flex';
 }
@@ -1216,6 +1322,9 @@ function closeOrgAsk(){document.getElementById('orgask').style.display='none';}
 function orgYes(){
   closeOrgAsk();
   if(!editTarget)return;
+  var isEv2=(editTarget.kind==='event');
+  document.getElementById('wsedittitlehead').innerHTML='&#9999;&#65039; Edit '+(isEv2?'event':'workshop');
+  document.getElementById('wscancelbtn').textContent='Cancel this '+(isEv2?'event':'workshop');
   document.getElementById('wsedittitle').textContent=editTarget.title;
   document.getElementById('wseditstart').value=/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(editTarget.start)?editTarget.start:'';
   document.getElementById('wseditend').value=/^([01][0-9]|2[0-3]):[0-5][0-9]$/.test(editTarget.end)?editTarget.end:'';
@@ -1227,7 +1336,7 @@ function closeWsEdit(){document.getElementById('wseditpop').style.display='none'
 function wsEditError(msg){return function(e){
   var t=String(e&&e.message||e);
   if(t.indexOf('permission')>-1||t.indexOf('insufficient')>-1){
-    msg.textContent='Editing blocked by database rules - the app organizer needs to allow workshop edits.';
+    msg.textContent='Editing blocked by database rules - the app organizer needs to allow edits.';
   }else{
     msg.textContent='Could not save: '+t;
   }
@@ -1247,7 +1356,11 @@ function saveWsEdit(){
   if(!myName){askName();}
   msg.textContent='Saving...';
   var p;
-  if(editTarget.kind==='wall'){
+  if(editTarget.kind==='event'){
+    p=db.collection('eventedits').doc(editTarget.id).set({
+      start:start, end:end, loc:loc.slice(0,60), cancelled:false, editedBy:myName||'', uid:uid
+    },{merge:true});
+  }else if(editTarget.kind==='wall'){
     p=db.collection('workshops').doc('wallover_'+editTarget.id).set({
       wallOverride:true, wallId:editTarget.id, start:start, end:end, loc:loc.slice(0,60),
       cancelled:false, editedBy:myName||'', uid:uid
@@ -1266,7 +1379,11 @@ function cancelWorkshopFromEdit(){
   if(!confirm('Cancel "'+editTarget.title+'" for everyone? It will be shown as cancelled.'))return;
   msg.textContent='Cancelling...';
   var p;
-  if(editTarget.kind==='wall'){
+  if(editTarget.kind==='event'){
+    p=db.collection('eventedits').doc(editTarget.id).set({
+      cancelled:true, editedBy:myName||'', uid:uid
+    },{merge:true});
+  }else if(editTarget.kind==='wall'){
     p=db.collection('workshops').doc('wallover_'+editTarget.id).set({
       wallOverride:true, wallId:editTarget.id, cancelled:true, editedBy:myName||'', uid:uid
     },{merge:true});
@@ -1878,6 +1995,14 @@ function initFirebase(){
         var wh=document.getElementById('wshint');
         if(wh)wh.textContent='Workshops are pinned to the wall daily - and posted here by the community. Spotted one? Add it so everyone can find it. Tap \u2606 to join and see who else is going.';
       }
+      db.collection('eventedits').onSnapshot(function(snap){
+        evOverrides={};
+        snap.forEach(function(doc){
+          var d=doc.data(); if(!d)return;
+          evOverrides[doc.id]={start:d.start||'',end:d.end||'',loc:d.loc||'',cancelled:!!d.cancelled,editedBy:d.editedBy||''};
+        });
+        applyEventOverrides();
+      });
       db.collection('counts').doc('going').onSnapshot(function(doc){
         goCount=(doc&&doc.exists)?(doc.data()||{}):{};
         updateGoingUI();
@@ -1931,7 +2056,7 @@ function initFirebase(){
 initFirebase();
 
 // ---- What's new (shown once per version) ----
-var APP_VERSION='14';
+var APP_VERSION='15';
 function showDrink(){document.getElementById('whatsnew').style.display='flex';}
 function dismissWn(){
   document.getElementById('whatsnew').style.display='none';
@@ -1999,6 +2124,8 @@ try{
 renderWorkshops();
 renderRides();
 renderLF();
+addEventEditButtons();
+applyEventOverrides();
 render();
 </script>
 
