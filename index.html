@@ -179,8 +179,7 @@ footer{text-align:center;font-size:11.5px;color:#9a8d80;padding:16px 16px 110px}
 </div></div>
 <div class="wn" id="verupd" style="display:none"><div class="wncard">
 <h3>&#127381; What's new</h3>
-<p class="wnnote"><b>New in version 15:</b> &#9999;&#65039; <b>Events can now be edited</b> - organizers tap <i>Edit event</i> on the card to change time, location or cancel. <b>Organizers only</b> - everyone sees the change.</p>
-<p class="wnnote"><b>Also new:</b> &#128172; Feedback via the speech bubble top left - we read everything!</p>
+<div id="verupdbody"></div>
 <p class="wnnote"><b>Also new:</b> &#129523; <b>Lost &amp; Found</b> (with photos) - and ride posters can switch their post between offer and request.</p>
 <p class="wnnote"><b>Also new:</b> &#128269; <b>Search</b> events &amp; workshops by keyword and filter workshops by <b>type</b> - Poi, Passing, Staff &amp; Fire, Acro and more.</p>
 <p class="wnnote"><b>Also new:</b> &#128663; <b>Rides</b> - offer a lift or find one, to or from the EJC! Post your ride with seats, costs, props space and contact - only you can update your seats. Tap <i>Show contact</i> to reach the driver directly. And now with a &#128506; <b>map view</b>: see all ride destinations as pins on a map!</p>
@@ -2062,6 +2061,29 @@ function dismissWn(){
   document.getElementById('whatsnew').style.display='none';
   try{localStorage.setItem('ejcVer',APP_VERSION);}catch(e){}
 }
+var VERSION_NOTES={
+  10:'&#9999;&#65039; <b>Workshops can be edited</b> by their organizers (tap <i>Edit workshop</i> on the card) - and starred workshops notify you when time or location changes.',
+  11:'&#128663; <b>Rides</b> - offer a lift or find one, with seats, costs, props space, contact and a &#128506; map view.',
+  12:'&#128269; <b>Search</b> events &amp; workshops across all days, and filter workshops by <b>type</b> (Poi, Passing, Staff &amp; Fire, ...).',
+  13:'&#129523; <b>Lost &amp; Found</b> (with photos) - and ride posters can switch their post between offer and request.',
+  14:'&#128172; <b>Feedback</b> - tap the speech bubble top left and tell us what to improve. We read everything!',
+  15:'&#9999;&#65039; <b>Events can be edited</b> - organizers tap <i>Edit event</i> on the card to change time, location or cancel. <b>Organizers only</b> - everyone sees the change.'
+};
+function showVerUpd(seen){
+  var from=parseInt(seen,10)||0;
+  var cur=parseInt(APP_VERSION,10)||0;
+  var html='';
+  Object.keys(VERSION_NOTES).map(Number).sort(function(a,b){return a-b;}).forEach(function(v){
+    if(v>from && v<=cur){html+='<p class="wnnote">'+VERSION_NOTES[v]+'</p>';}
+  });
+  if(!html){
+    try{localStorage.setItem('ejcVer',APP_VERSION);}catch(e){}
+    return false;
+  }
+  document.getElementById('verupdbody').innerHTML=html;
+  document.getElementById('verupd').style.display='flex';
+  return true;
+}
 function dismissVerUpd(){
   document.getElementById('verupd').style.display='none';
   try{localStorage.setItem('ejcVer',APP_VERSION);}catch(e){}
@@ -2071,8 +2093,9 @@ try{
   localStorage.setItem('ejcOpens',String(opens));
   var seenVer=localStorage.getItem('ejcVer');
   if(seenVer!==APP_VERSION){
-    // new device: meet the makers - existing users: just the updates
-    document.getElementById(seenVer?'verupd':'whatsnew').style.display='flex';
+    // new device: meet the makers - existing users: only the notes they haven't seen
+    if(seenVer){showVerUpd(seenVer);}
+    else{document.getElementById('whatsnew').style.display='flex';}
   }else if(opens>=5 && !localStorage.getItem('ejcDrinkAsk1')){
     localStorage.setItem('ejcDrinkAsk1','1');
     document.getElementById('whatsnew').style.display='flex';
